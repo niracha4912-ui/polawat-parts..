@@ -1,0 +1,237 @@
+```html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบค้นหาอะไหล่ POLAWAT ENGINE</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f1f5f9;
+    margin: 0;
+    color: #1e293b;
+}
+
+header {
+    background: #12345a;
+    color: white;
+    text-align: center;
+    padding: 25px;
+}
+
+header h1 {
+    margin: 0 0 8px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 25px auto;
+    padding: 15px;
+}
+
+.panel {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 12px #00000010;
+}
+
+.search {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #1769aa;
+    border-radius: 8px;
+    font-size: 17px;
+}
+
+.parts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 18px;
+}
+
+.part-card {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 3px 12px #00000010;
+}
+
+.part-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.code {
+    color: #1769aa;
+    font-weight: bold;
+}
+
+.no-result {
+    text-align: center;
+    padding: 25px;
+    color: #dc2626;
+    font-size: 18px;
+}
+
+@media (max-width: 600px) {
+    header {
+        padding: 20px 10px;
+    }
+
+    header h1 {
+        font-size: 22px;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    .panel {
+        padding: 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>ค้นหาอะไหล่พลวัชร์ เครื่องยนต์</h1>
+    <p>SPARE PARTS POLAWAT ENGINE CO.,LTD</p>
+</header>
+
+<div class="container">
+
+    <section class="panel">
+        <h2>🔍 ค้นหาอะไหล่</h2>
+
+        <input
+            type="text"
+            id="searchInput"
+            class="search"
+            placeholder="พิมพ์ชื่ออะไหล่ หรือรหัสอะไหล่..."
+            oninput="searchParts()"
+        >
+
+        <p id="resultCount">พบอะไหล่ 3 รายการ</p>
+    </section>
+
+    <section class="panel">
+        <h2>📦 รายการอะไหล่ทั้งหมด</h2>
+
+        <div id="partsList" class="parts-grid"></div>
+    </section>
+
+</div>
+
+<script>
+
+// ข้อมูลอะไหล่
+let parts = [
+    {
+        code: "SP001",
+        name: "ไส้กรองน้ำมันเครื่อง",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbdnBfdD_p3QH8Ge4u8CRo9v88IECFTEVJLJBbhv03Gj_rfB-OVSkVpk1J&s=10"
+    },
+    {
+        code: "SP002",
+        name: "หัวเทียน",
+        image: "https://placehold.co/400x250?text=Spark+Plug"
+    },
+    {
+        code: "SP003",
+        name: "ผ้าเบรก",
+        image: "https://placehold.co/400x250?text=Brake+Pad"
+    }
+];
+
+// ป้องกัน HTML แทรกในข้อมูล
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+// ระบบค้นหาอะไหล่
+function searchParts() {
+
+    let keyword = document
+        .getElementById("searchInput")
+        .value
+        .trim()
+        .toLowerCase();
+
+    let filteredParts = parts.filter(part => {
+
+        return part.code.toLowerCase().includes(keyword) ||
+               part.name.toLowerCase().includes(keyword);
+
+    });
+
+    displayParts(filteredParts);
+}
+
+// แสดงรายการอะไหล่
+function displayParts(data) {
+
+    const list = document.getElementById("partsList");
+
+    document.getElementById("resultCount").textContent =
+        "พบอะไหล่ " + data.length + " รายการ";
+
+    list.innerHTML = "";
+
+    if (data.length === 0) {
+        list.innerHTML =
+            '<p class="no-result">ไม่พบข้อมูลอะไหล่ที่ค้นหา</p>';
+        return;
+    }
+
+    data.forEach(part => {
+
+        const card = document.createElement("div");
+
+        card.className = "part-card";
+
+        card.innerHTML = `
+            <img
+                src="${escapeHTML(part.image)}"
+                alt="${escapeHTML(part.name)}"
+                onerror="this.src='https://placehold.co/400x250?text=No+Image'"
+            >
+
+            <h3>${escapeHTML(part.name)}</h3>
+
+            <p>
+                รหัสอะไหล่:
+                <span class="code">${escapeHTML(part.code)}</span>
+            </p>
+        `;
+
+        list.appendChild(card);
+    });
+}
+
+// เริ่มต้นระบบ
+displayParts(parts);
+
+</script>
+
+</body>
+</html>
+```
